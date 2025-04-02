@@ -4,16 +4,13 @@ import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
 import {
   ErrorComponent,
-  ThemedLayoutV2,
-  ThemedSiderV2,
   useNotificationProvider,
 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
 
-import dataProvider, {
-  GraphQLClient,
-  liveProvider,
-} from "@refinedev/nestjs-query";
+import { dataProvider, liveProvider } from "./providers/data";
+import { Home } from "./pages";
+
 import routerBindings, {
   CatchAllNavigate,
   DocumentTitleHandler,
@@ -21,48 +18,39 @@ import routerBindings, {
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
 import { App as AntdApp } from "antd";
-import { createClient } from "graphql-ws";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
-import { authProvider } from "./authProvider";
-import { Header } from "./components/header";
-import { ColorModeContextProvider } from "./contexts/color-mode";
-import {
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostList,
-  BlogPostShow,
-} from "./pages/blog-posts";
-import {
-  CategoryCreate,
-  CategoryEdit,
-  CategoryList,
-  CategoryShow,
-} from "./pages/categories";
+import Layout from "./components/layouts"
+
 import { ForgotPassword } from "./pages/forgotPassword";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
+import { authProvider } from "./providers/auth";
+import { resources } from "./config/resources";
+import CompanyList from "./pages/company/list";
+import Create from "./pages/company/create";
+//import Edit from "./pages/company/edit";
+import EditPage from "./pages/company/edit";
+import List from "./pages/tasks/list";
+import CreateTask from "./pages/tasks/create";
+import EditTask from "./pages/tasks/edit";
 
-const API_URL = "https://api.nestjs-query.refine.dev/graphql";
-const WS_URL = "wss://api.nestjs-query.refine.dev/graphql";
 
-const gqlClient = new GraphQLClient(API_URL);
-const wsClient = createClient({ url: WS_URL });
 
 function App() {
   return (
     <BrowserRouter>
       <GitHubBanner />
       <RefineKbarProvider>
-        <ColorModeContextProvider>
           <AntdApp>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider(gqlClient)}
-                liveProvider={liveProvider(wsClient)}
+                dataProvider={dataProvider}
+                liveProvider={liveProvider}
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
-                authProvider={authProvider}
-                resources={[
+                 authProvider={authProvider}
+                resources= {resources}
+                /*{[
                   {
                     name: "blog_posts",
                     list: "/blog-posts",
@@ -83,7 +71,7 @@ function App() {
                       canDelete: true,
                     },
                   },
-                ]}
+                ]}*/
                 options={{
                   syncWithLocation: true,
                   warnWhenUnsavedChanges: true,
@@ -96,35 +84,31 @@ function App() {
                   <Route
                     element={
                       <Authenticated
-                        key="authenticated-inner"
+                        key="authenticated-layout"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
-                        <ThemedLayoutV2
-                          Header={Header}
-                          Sider={(props) => <ThemedSiderV2 {...props} fixed />}
-                        >
+                        <Layout>
                           <Outlet />
-                        </ThemedLayoutV2>
+                        </Layout>
                       </Authenticated>
                     }
                   >
-                    <Route
-                      index
-                      element={<NavigateToResource resource="blog_posts" />}
-                    />
-                    <Route path="/blog-posts">
-                      <Route index element={<BlogPostList />} />
-                      <Route path="create" element={<BlogPostCreate />} />
-                      <Route path="edit/:id" element={<BlogPostEdit />} />
-                      <Route path="show/:id" element={<BlogPostShow />} />
-                    </Route>
-                    <Route path="/categories">
-                      <Route index element={<CategoryList />} />
-                      <Route path="create" element={<CategoryCreate />} />
-                      <Route path="edit/:id" element={<CategoryEdit />} />
-                      <Route path="show/:id" element={<CategoryShow />} />
-                    </Route>
+                    <Route index element = {<Home/>} />
+                    <Route path="/companies">
+                       <Route index element ={<CompanyList/>} />
+                       <Route path="new" element={<Create/>}/>
+                       <Route path="edit/:id" element={<EditPage/>}/>
+
                     <Route path="*" element={<ErrorComponent />} />
+                  </Route>
+                  <Route path="/tasks" element={
+                    <List>
+                      <Outlet/>
+                    </List>
+                  }>
+                    <Route path="new" element={< CreateTask/>}/>
+                    <Route path="edit/:id" element={<EditTask/>}/>
+                  </Route>
                   </Route>
                   <Route
                     element={
@@ -143,6 +127,9 @@ function App() {
                       element={<ForgotPassword />}
                     />
                   </Route>
+
+
+                  
                 </Routes>
 
                 <RefineKbar />
@@ -152,10 +139,10 @@ function App() {
               <DevtoolsPanel />
             </DevtoolsProvider>
           </AntdApp>
-        </ColorModeContextProvider>
       </RefineKbarProvider>
     </BrowserRouter>
   );
 }
 
 export default App;
+  
