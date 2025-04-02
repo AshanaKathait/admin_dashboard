@@ -2,18 +2,25 @@ import CustomAvatar from '@/components/custom-avatar';
 import { Text } from '@/components/text';
 import { COMPANIES_LIST_QUERY } from '@/graphql/queries';
 import { Company } from '@/graphql/schema.types';
+import { CompaniesListQuery } from '@/graphql/types';
 import { currencyNumber } from '@/utilities';
 import { SearchOutlined } from '@ant-design/icons';
-import { CreateButton, DeleteButton, EditButton, FilterDropdown, List } from '@refinedev/antd'
-import { getDefaultFilter, useGo, useTable } from '@refinedev/core'
+import { CreateButton, DeleteButton, EditButton, FilterDropdown, List, useTable } from '@refinedev/antd'
+import { getDefaultFilter, HttpError, useGo} from '@refinedev/core'
+import { GetFieldsFromList } from '@refinedev/nestjs-query';
 import { Input, Space, Table } from 'antd';
 import React from 'react'
 
 const CompanyList = ({ children }: React.PropsWithChildren) => {
   const go = useGo();
-  const { tableQueryResult, filters } = useTable({
+  const {tableProps, filters } = useTable<
+  GetFieldsFromList<CompaniesListQuery>,
+  HttpError,
+  GetFieldsFromList<CompaniesListQuery>
+  >({
     resource: 'companies',
     onSearch: (values) =>{
+ 
       return [
         {
           field: 'name',
@@ -48,9 +55,9 @@ const CompanyList = ({ children }: React.PropsWithChildren) => {
     }
   });
 
-  const data = tableQueryResult?.data?.data || [];
-  const isLoading = tableQueryResult?.isLoading;
-  const pagination = tableQueryResult?.pagination;
+  //const data = tableProps?.data?.data || [];
+  //const isLoading = tableProps?.isLoading;
+  const pagination = tableProps?.pagination;
 
   return (
   <div>  
@@ -74,10 +81,11 @@ const CompanyList = ({ children }: React.PropsWithChildren) => {
     )}
     >
       <Table
-      dataSource={data}
-      loading={isLoading}
+      {...tableProps}
+      //dataSource={data}
+      //loading={isLoading}
       pagination={{
-        ...pagination,
+        ...tableProps.pagination,
       }}
       rowKey="id"
       >

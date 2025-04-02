@@ -25,6 +25,7 @@ type ProjectCardProps = {
 
 const ProjectCard = ({id, title, dueDate, users}: ProjectCardProps) => {
     const { token } = theme.useToken();
+    //const edit = () => {}
 
     const {edit} = useNavigation();
     const {mutate} = useDelete(); 
@@ -85,7 +86,7 @@ const ProjectCard = ({id, title, dueDate, users}: ProjectCardProps) => {
         <Card
         size="small"
         title={<Text ellipsis={{tooltip: title}}>{title}</Text>}
-        onClick={() => edit()}
+        //onClick={() => edit()}
         extra={
             <Dropdown
              trigger={["click"]}
