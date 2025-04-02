@@ -9,7 +9,7 @@ import dayjs from 'dayjs'
 import CustomAvatar from '../custom-avatar'
 
 const LatestActivities = () => {
-    const {data: audit, isLoadingAudit, isError, error} = useList({
+    const {data: audit, isError, error} = useList({
         resource: 'audits',
         meta: {
             gqlQuery: DASHBOARD_LATEST_ACTIVITIES_AUDITS_QUERY
